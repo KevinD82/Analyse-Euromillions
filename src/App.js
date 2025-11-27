@@ -49,7 +49,7 @@ function App() {
   const fetchLatestDraws = async () => {
     try {
       // Placeholder API (à remplacer par une source réelle)
-      const response = await fetch('https://euromillions.api.pedromealha.dev');
+      const response = await fetch('https://rapidapi.com/jribeiro19/api/euro-millions');
       const json = await response.json();
       const normalizedData = json.map(row => normalizeKeys(row));
       setData(normalizedData);
