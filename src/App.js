@@ -100,6 +100,20 @@ function App() {
     const starCounts = {};
     allStars.forEach(s => starCounts[s] = (starCounts[s]||0)+1);
 
+    const pairs = allNums.filter(n => n % 2 === 0).length;
+    const impairs = allNums.length - pairs;
+
+    const sums = data.map(row => ['num1','num2','num3','num4','num5'].reduce((acc,k)=>acc+(row[k]||0),0));
+    const gaps = data.map(row => {
+      const nums = ['num1','num2','num3','num4','num5'].map(k=>row[k]);
+      return Math.max(...nums)-Math.min(...nums);
+    });
+
+    const ranges = { '0-9':0,'10-19':0,'20-29':0,'30-39':0,'40-50':0 };
+    allNums.forEach(n => {
+      if(n<=9) ranges['0-9']++; else if(n<=19) ranges['10-19']++; else if(n<=29) ranges['20-29']++; else if(n<=39) ranges['30-39']++; else ranges['40-50']++;
+    });
+
     const numChart = {
       labels: Object.keys(numCounts),
       datasets: [{ label: 'Fréquence des numéros', data: Object.values(numCounts), backgroundColor: 'rgba(54,162,235,0.6)' }]
@@ -108,19 +122,31 @@ function App() {
       labels: Object.keys(starCounts),
       datasets: [{ label: 'Fréquence des étoiles', data: Object.values(starCounts), backgroundColor: 'rgba(255,99,132,0.6)' }]
     };
+    const pairChart = {
+      labels: ['Pairs','Impairs'],
+      datasets: [{ label: 'Répartition pair/impair', data: [pairs, impairs], backgroundColor: ['rgba(75,192,192,0.6)','rgba(255,206,86,0.6)'] }]
+    };
+    const rangeChart = {
+      labels: Object.keys(ranges),
+      datasets: [{ label: 'Répartition par dizaines', data: Object.values(ranges), backgroundColor: 'rgba(153,102,255,0.6)' }]
+    };
 
     return (
       <div>
         <h2>Analyses</h2>
         <Bar data={numChart} />
         <Bar data={starChart} />
+        <Bar data={pairChart} />
+        <Bar data={rangeChart} />
+        <p>Somme moyenne des numéros: {Math.round(sums.reduce((a,b)=>a+b,0)/sums.length)}</p>
+        <p>Écart moyen entre numéros: {Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length)}</p>
       </div>
     );
   };
 
   return (
     <div className='container'>
-      <h1>EuroMillions Analyst avec Fetch</h1>
+      <h1>EuroMillions Analyst Complet</h1>
       <input type='file' accept='.xlsx,.csv' onChange={handleFileUpload} />
       <button onClick={fetchLatestDraws}>Mettre à jour les tirages</button>
       {error && <p style={{color:'red'}}>{error}</p>}
