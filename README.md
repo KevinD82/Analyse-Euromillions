@@ -1,14 +1,13 @@
-# EuroMillions React App avec Fetch
+# Backend Node.js pour EuroMillions
 
 ## Fonctionnalités
-- Lecture des fichiers Excel
-- Bouton pour récupérer automatiquement les derniers tirages depuis une API (placeholder)
-- Analyses : Fréquence des numéros et étoiles
-- Génération de 5 grilles optimisées
+- Scrappe les derniers tirages EuroMillions depuis le site FDJ.
+- Expose une API REST avec `/api/latest` qui renvoie les tirages en JSON.
 
-## Déploiement sur Vercel
-1. Créez un compte sur [Vercel](https://vercel.com).
-2. Importez ce projet depuis GitHub ou uploadez le ZIP.
-3. Configurez le build : `npm install && npm run build`.
-4. Dossier de sortie : `build`.
-5. Déployez et obtenez votre URL personnalisée.
+## Déploiement
+1. Installez les dépendances : `npm install`
+2. Lancez le serveur : `npm start`
+3. Déployez sur Vercel ou Render (Node.js supporté).
+
+## Exemple d'appel API
+GET https://votre-domaine/api/latest
