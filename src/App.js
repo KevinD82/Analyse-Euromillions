@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import * as XLSX from 'xlsx';
 import './styles.css';
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,7 +13,6 @@ import {
 } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
 
 function App() {
   const [data, setData] = useState(null);
@@ -74,16 +72,40 @@ function App() {
 
   const renderCharts = () => {
     if (!data) return null;
+
     const allNums = [];
     const allStars = [];
     data.forEach(row => {
       ['num1','num2','num3','num4','num5'].forEach(k => allNums.push(row[k]));
       ['etoile1','etoile2'].forEach(k => allStars.push(row[k]));
     });
+
+    // Fréquence des numéros
     const numCounts = {};
     allNums.forEach(n => numCounts[n] = (numCounts[n]||0)+1);
+
+    // Fréquence des étoiles
     const starCounts = {};
     allStars.forEach(s => starCounts[s] = (starCounts[s]||0)+1);
+
+    // Pair/impair
+    const pairs = allNums.filter(n => n % 2 === 0).length;
+    const impairs = allNums.length - pairs;
+
+    // Somme des numéros par tirage
+    const sums = data.map(row => ['num1','num2','num3','num4','num5'].reduce((acc,k)=>acc+(row[k]||0),0));
+
+    // Écart entre numéros par tirage
+    const gaps = data.map(row => {
+      const nums = ['num1','num2','num3','num4','num5'].map(k=>row[k]);
+      return Math.max(...nums)-Math.min(...nums);
+    });
+
+    // Répartition par dizaines
+    const ranges = { '0-9':0,'10-19':0,'20-29':0,'30-39':0,'40-50':0 };
+    allNums.forEach(n => {
+      if(n<=9) ranges['0-9']++; else if(n<=19) ranges['10-19']++; else if(n<=29) ranges['20-29']++; else if(n<=39) ranges['30-39']++; else ranges['40-50']++;
+    });
 
     const numChart = {
       labels: Object.keys(numCounts),
@@ -93,19 +115,31 @@ function App() {
       labels: Object.keys(starCounts),
       datasets: [{ label: 'Fréquence des étoiles', data: Object.values(starCounts), backgroundColor: 'rgba(255,99,132,0.6)' }]
     };
+    const pairChart = {
+      labels: ['Pairs','Impairs'],
+      datasets: [{ label: 'Répartition pair/impair', data: [pairs, impairs], backgroundColor: ['rgba(75,192,192,0.6)','rgba(255,206,86,0.6)'] }]
+    };
+    const rangeChart = {
+      labels: Object.keys(ranges),
+      datasets: [{ label: 'Répartition par dizaines', data: Object.values(ranges), backgroundColor: 'rgba(153,102,255,0.6)' }]
+    };
 
     return (
       <div>
-        <h2>Analyse des tirages</h2>
+        <h2>Analyses</h2>
         <Bar data={numChart} />
         <Bar data={starChart} />
+        <Bar data={pairChart} />
+        <Bar data={rangeChart} />
+        <p>Somme moyenne des numéros: {Math.round(sums.reduce((a,b)=>a+b,0)/sums.length)}</p>
+        <p>Écart moyen entre numéros: {Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length)}</p>
       </div>
     );
   };
 
   return (
     <div className='container'>
-      <h1>EuroMillions Analyst Final</h1>
+      <h1>EuroMillions Analyst Ultimate</h1>
       <input type='file' accept='.xlsx,.csv' onChange={handleFileUpload} />
       {error && <p style={{color:'red'}}>{error}</p>}
       {data && <p>{data.length} tirages chargés</p>}
