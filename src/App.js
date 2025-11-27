@@ -46,20 +46,19 @@ function App() {
     reader.readAsBinaryString(file);
   };
 
-  const fetchLatestDraws = async () => {
-    try {
-      // Placeholder API (à remplacer par une source réelle)
-      const response = await fetch('https://zylalabs.com/api-marketplace/data/euro+millions+results+api/2279');
-      const json = await response.json();
-      const normalizedData = json.map(row => normalizeKeys(row));
-      setData(normalizedData);
-      if (normalizedData.length > 0) {
-        alert(`Dernier tirage : ${normalizedData[0].date}`);
-      }
-    } catch (err) {
-      setError('Impossible de récupérer les tirages en ligne.');
-    }
-  };
+  
+const fetchLatestDraws = async () => {
+  try {
+    const response = await fetch('https://euromillions.api.pedromealha.dev/v1/draws/latest');
+    const json = await response.json();
+    const normalizedData = [normalizeKeys(json)]; // Dernier tirage
+    setData(normalizedData);
+    alert(`Dernier tirage : ${normalizedData[0].date}`);
+  } catch (err) {
+    setError('Impossible de récupérer les tirages en ligne.');
+  }
+};
+
 
   const generateGrids = () => {
     const numHot = [21, 42, 35, 29, 19];
