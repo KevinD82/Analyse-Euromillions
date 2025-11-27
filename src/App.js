@@ -47,17 +47,24 @@ function App() {
   };
 
   
+
 const fetchLatestDraws = async () => {
   try {
     const response = await fetch('https://euromillions.api.pedromealha.dev/v1/draws/latest');
     const json = await response.json();
-    const normalizedData = [normalizeKeys(json)]; // Dernier tirage
+
+    // Normalisation des clés
+    const normalizedData = [normalizeKeys(json)];
     setData(normalizedData);
-    alert(`Dernier tirage : ${normalizedData[0].date}`);
+
+    if (normalizedData.length > 0) {
+      alert(`Dernier tirage : ${normalizedData[0].date}`);
+    }
   } catch (err) {
     setError('Impossible de récupérer les tirages en ligne.');
   }
 };
+
 
 
   const generateGrids = () => {
