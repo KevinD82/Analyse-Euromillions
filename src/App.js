@@ -46,21 +46,6 @@ function App() {
     reader.readAsBinaryString(file);
   };
 
-  const fetchLatestDraws = async () => {
-    try {
-      // Placeholder API (à remplacer par une source réelle)
-      const response = await fetch('https://api.example.com/euromillions/latest');
-      const json = await response.json();
-      const normalizedData = json.map(row => normalizeKeys(row));
-      setData(normalizedData);
-      if (normalizedData.length > 0) {
-        alert(`Dernier tirage : ${normalizedData[0].date}`);
-      }
-    } catch (err) {
-      setError('Impossible de récupérer les tirages en ligne.');
-    }
-  };
-
   const generateGrids = () => {
     const numHot = [21, 42, 35, 29, 19];
     const numCold = [50, 46, 34, 30, 23];
@@ -95,20 +80,28 @@ function App() {
       ['etoile1','etoile2'].forEach(k => allStars.push(row[k]));
     });
 
+    // Fréquence des numéros
     const numCounts = {};
     allNums.forEach(n => numCounts[n] = (numCounts[n]||0)+1);
+
+    // Fréquence des étoiles
     const starCounts = {};
     allStars.forEach(s => starCounts[s] = (starCounts[s]||0)+1);
 
+    // Pair/impair
     const pairs = allNums.filter(n => n % 2 === 0).length;
     const impairs = allNums.length - pairs;
 
+    // Somme des numéros par tirage
     const sums = data.map(row => ['num1','num2','num3','num4','num5'].reduce((acc,k)=>acc+(row[k]||0),0));
+
+    // Écart entre numéros par tirage
     const gaps = data.map(row => {
       const nums = ['num1','num2','num3','num4','num5'].map(k=>row[k]);
       return Math.max(...nums)-Math.min(...nums);
     });
 
+    // Répartition par dizaines
     const ranges = { '0-9':0,'10-19':0,'20-29':0,'30-39':0,'40-50':0 };
     allNums.forEach(n => {
       if(n<=9) ranges['0-9']++; else if(n<=19) ranges['10-19']++; else if(n<=29) ranges['20-29']++; else if(n<=39) ranges['30-39']++; else ranges['40-50']++;
@@ -146,9 +139,8 @@ function App() {
 
   return (
     <div className='container'>
-      <h1>EuroMillions Analyst Complet</h1>
+      <h1>EuroMillions Analyst Ultimate</h1>
       <input type='file' accept='.xlsx,.csv' onChange={handleFileUpload} />
-      <button onClick={fetchLatestDraws}>Mettre à jour les tirages</button>
       {error && <p style={{color:'red'}}>{error}</p>}
       {data && <p>{data.length} tirages chargés</p>}
       <button onClick={generateGrids}>Générer 5 grilles optimisées</button>
